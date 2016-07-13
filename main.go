@@ -24,45 +24,41 @@ func check(e error) {
 	}
 }
 
-type RouterObject struct {
-	key   []rune
-	value func(i chan rune, o chan rune)
-}
-
 type Router struct {
-	filters    []RouterObject
+	filters    map[string]func(i chan rune, o chan rune)
 	deque      lane.Deque
+    warn       []rune
 	currentStr []rune
 }
 
 func (r *Router) add_function(key []rune, f func(chan rune, chan rune)) {
-	r.filters = append(r.filters, RouterObject{key, f})
+	r.filters[string(key)] = f
 }
 
 func (r *Router) init() {
 	r.deque = *lane.NewDeque()
+    r.filters = map[string]func(i chan rune, o chan rune){}
 }
 
 func (r *Router) route() {
 	//	filters := r.filters
-	counter := 0
-	tag := ""
-	depth := 0
-//	    out := make(chan rune)//This is a stream of characters to send to filter
-//	    in := make(chan rune)//This is that return data, after it's been filtered.
+	tag := []rune{}
+    tags := []rune{}
+	out := make(chan rune)//This is a stream of characters to send to filter
 	for i := range r.Iter() {
-		counter++
 		if i == rune(40) {
-			depth++
-		} else if i == rune(41) {
-			depth--
-		} else if depth == 0{
-		    tag = tag + string(i)
+            filter := r.filters[string(tag)]
+            fmt.Println(string(tag))
+            tag = []rune{}
+            if filter != nil {
+                filter(r.Iter(), out)
+            }
         } else {
-            fmt.Println(tag)
-            tag = ""
+            tag = append(tag, i)
+     //       fmt.Println(string(i))
         }
 	}
+    fmt.Println(string(tags))
 }
 
 func (r *Router) Append(l []rune) {
@@ -71,7 +67,7 @@ func (r *Router) Append(l []rune) {
 	r.deque.Prepend(l)
 }
 
-func (r *Router) Iter() <-chan rune {
+func (r *Router) Iter() chan rune {
 	ch := make(chan rune)
 	go func() {
 		for {
