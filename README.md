@@ -31,32 +31,15 @@ If you're more interested in efficiency, you can pull that "polygon()" command
 out of the queue before it gets simplified into a series of lines and
 triangles.
 
----
+#Performance
 
-The internal flow is hopefully equally simple.
+This is my first major project in a statically typed language. It's go largely
+because I think I'm less likely to do something *horribly* wrong in golang then
+in C.
 
-A stream of commands gets sent to a "router" function. It checks the name
-("name(blehblehbleh)") against a list of filters.
+That being said, it was created with performance in mind. I don't know how
+golangs internals work, but it makes heavy use of channels. Hopefully that
+minimizes cache mis-predicts, and can create some very fast code.
 
-When it matches, the function transorms the input and appends it to the
-begining or end of the buffer.
-
-```
-red(text(Hello World))
-
-```
-
-to
-
-```
-
-saveColor()
-color(#FF0000)
-text(Hello World)
-restoreColor()
-
-```
-
-Some other stuff about a filter that stores function calls.
-
-How do we make history/scrollback work?
+It doesn't make good use of multithreading, but our routing functions should be
+able to handle it at some point in the future.

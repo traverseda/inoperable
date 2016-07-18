@@ -2,9 +2,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/oleiade/lane"
+	"fmt"
 	"io/ioutil"
+    //"gopkg.in/yaml.v2"
 	//    "bufio"
 	//    "io"
 	//    "strings"
@@ -14,8 +15,22 @@ import (
 	//    "container/list"
 )
 
-func print(i chan rune, o chan rune) {
-	//fmt.Println(i)
+func passthrough(i chan rune, o chan rune) {
+    depth:=1
+    for foo := range i {
+        //This chunk of code counts brackets, and stops the filter when it's done.
+        //You could keep reading after you should be closed, but that's going to break everything.
+        fmt.Println(string(foo))
+        if foo == rune(40) {
+            depth++
+        } else if foo == rune(41){
+            depth--
+        }
+        if depth == 0{
+            close(o)
+            break
+        }
+    }
 }
 
 func check(e error) {
@@ -26,8 +41,8 @@ func check(e error) {
 
 type Router struct {
 	filters    map[string]func(i chan rune, o chan rune)
+    unkownTag  func(i chan rune, o chan rune)
 	deque      lane.Deque
-    warn       []rune
 	currentStr []rune
 }
 
@@ -41,21 +56,22 @@ func (r *Router) init() {
 }
 
 func (r *Router) route() {
-	//	filters := r.filters
 	tag := []rune{}
     tags := []rune{}
-	out := make(chan rune)//This is a stream of characters to send to filter
-	for i := range r.Iter() {
+	out := make(chan rune)//This is a stream of characters the filter returns
+    bar := r.Iter()
+	for i := range bar {
+     //   fmt.Println(o)
 		if i == rune(40) {
             filter := r.filters[string(tag)]
-            fmt.Println(string(tag))
             tag = []rune{}
             if filter != nil {
+                fmt.Println(filter)
                 filter(r.Iter(), out)
             }
         } else {
             tag = append(tag, i)
-     //       fmt.Println(string(i))
+            fmt.Println(string(i))
         }
 	}
     fmt.Println(string(tags))
@@ -99,10 +115,9 @@ func strToRune(input string) []rune {
 func main() {
 	r := Router{}
 	r.init()
-	r.add_function(strToRune("print"), print)
+	r.add_function(strToRune("print"), passthrough)
 	dat, err := ioutil.ReadFile("./test.tmp")
 	check(err)
 	r.deque.Prepend(strToRune(string(dat)))
-	r.deque.Prepend(strToRune("print(hello world)"))
 	r.route()
 }
