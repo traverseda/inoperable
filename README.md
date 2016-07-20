@@ -31,7 +31,27 @@ If you're more interested in efficiency, you can pull that "polygon()" command
 out of the queue before it gets simplified into a series of lines and
 triangles.
 
-##Color
+##Styling/color
+
+This project is *not* intended to be marketer freindly. You can customize how
+your data is presented to get the best user-experience possible, but it's not
+intended to help you this "brand awareness" or anything like that.
+
+There are 7 colors you can use, by default.
+
+Background, Default, Primary, Success, Info, Warning, and Danger.
+
+These generally map to Background (black, white), Neutral (grey), Purple, Green, Cyan, Yellow, and
+Red.
+
+There are low and high-contrast varients of each. On a black background, High
+contrast means the color is lighter. On a white background, it means it's
+darker.
+
+We hope to provide a variety of hatch styles, to furthur customize things like
+interactive maps.
+
+##Color tags exampole
 
 ```
 red(text(Hello World))
