@@ -18,6 +18,7 @@ import (
 func passthrough(i chan rune, o chan rune) {
     depth:=1
     for foo := range i {
+        fmt.Println(foo)
         //This chunk of code counts brackets, and stops the filter when it's done.
         //You could keep reading after you should be closed, but that's going to break everything.
         fmt.Println(string(foo))
@@ -57,24 +58,25 @@ func (r *Router) init() {
 
 func (r *Router) route() {
 	tag := []rune{}
-    tags := []rune{}
+    //tags := []rune{}
 	out := make(chan rune)//This is a stream of characters the filter returns
-    bar := r.Iter()
-	for i := range bar {
+    in := r.Iter() //This is the stream of characters we check for tags, then send to the tagged filter.
+	for i := range in {
      //   fmt.Println(o)
+        r.filters["print"](in, out)
 		if i == rune(40) {
             filter := r.filters[string(tag)]
             tag = []rune{}
             if filter != nil {
-                fmt.Println(filter)
+                //fmt.Println(filter)
                 filter(r.Iter(), out)
             }
         } else {
             tag = append(tag, i)
-            fmt.Println(string(i))
+            //fmt.Println(string(i))
         }
 	}
-    fmt.Println(string(tags))
+    //fmt.Println(string(tags))
 }
 
 func (r *Router) Append(l []rune) {
