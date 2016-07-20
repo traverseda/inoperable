@@ -1,6 +1,6 @@
 print(
 red(adawd)
-green(awdalha)
 )
+green(text(awdalha))
 notPrint()
 print(hello world)

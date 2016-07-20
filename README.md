@@ -31,6 +31,18 @@ If you're more interested in efficiency, you can pull that "polygon()" command
 out of the queue before it gets simplified into a series of lines and
 triangles.
 
+##Color
+
+```
+red(text(Hello World))
+---
+SaveColor()
+SetColor(#F00)
+text(Hello World)
+RestoreColor()
+
+```
+
 #Performance
 
 This is my first major project in a statically typed language. It's go largely
