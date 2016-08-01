@@ -35,7 +35,7 @@ triangles.
 
 This project is *not* intended to be marketer freindly. You can customize how
 your data is presented to get the best user-experience possible, but it's not
-intended to help you this "brand awareness" or anything like that.
+intended to help you with "brand awareness" or anything like that.
 
 A lot of technical choices have/will be made that will make it generally
 difficult to take control away from your apps users and insert your own brand
@@ -55,7 +55,7 @@ darker.
 We hope to provide a variety of hatch styles, to furthur customize things like
 interactive maps.
 
-##Color tags exampole
+##Color tags example
 
 ```
 red(text(Hello World))
