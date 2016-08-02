@@ -28,7 +28,7 @@ func passthrough(i chan rune, o chan rune) {
 			depth--
 		}
 		if depth == 0 {
-			close(o)
+			//close(o)
 			break
 		}
 	}
@@ -54,6 +54,7 @@ func (r *Router) add_function(key []rune, f func(chan rune, chan rune)) {
 func (r *Router) init() {
 	r.deque = *lane.NewDeque()
 	r.filters = map[string]func(i chan rune, o chan rune){}
+	r.unkownTag = passthrough
 }
 
 func (r *Router) route() {
@@ -68,9 +69,15 @@ func (r *Router) route() {
 	for i := range in {
 		if i == rune40 {
 			filter := r.filters[string(tag)]
+			fmt.Print("Tag: ")
+			fmt.Println(string(tag))
 			tag = []rune{}
+			fmt.Print("Tag: ")
+			fmt.Println(string(tag))
 			if filter != nil {
 				filter(in, out)
+			} else {
+				r.unkownTag(in, out)
 			}
 		} else {
 			tag = append(tag, i)
