@@ -66,13 +66,13 @@ func (r *Router) route() {
 	rune40 := rune(40)
 	for i := range in {
 		//   fmt.Println(o)
-		r.filters["print"](in, out)
+		// r.filters["print"](in, out)
 		if i == rune40 {
 			filter := r.filters[string(tag)]
 			tag = []rune{}
 			if filter != nil {
 				//fmt.Println(filter)
-				filter(r.Iter(), out)
+				filter(in, out)
 			}
 		} else {
 			tag = append(tag, i)
