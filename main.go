@@ -64,22 +64,18 @@ func (r *Router) route() {
 	// rune(40) is '('
 	// Someone sometime find out if this is more efficient than having rune(40) in the for loop or not.
 	rune40 := rune(40)
+	// Looping over individual runes in the channel
 	for i := range in {
-		//   fmt.Println(o)
-		// r.filters["print"](in, out)
 		if i == rune40 {
 			filter := r.filters[string(tag)]
 			tag = []rune{}
 			if filter != nil {
-				//fmt.Println(filter)
 				filter(in, out)
 			}
 		} else {
 			tag = append(tag, i)
-			//fmt.Println(string(i))
 		}
 	}
-	//fmt.Println(string(tags))
 }
 
 func (r *Router) Append(l []rune) {
