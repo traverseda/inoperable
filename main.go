@@ -2,10 +2,10 @@
 package main
 
 import (
-	"github.com/oleiade/lane"
 	"fmt"
+	"github.com/oleiade/lane"
 	"io/ioutil"
-    //"gopkg.in/yaml.v2"
+	//"gopkg.in/yaml.v2"
 	//    "bufio"
 	//    "io"
 	//    "strings"
@@ -16,22 +16,22 @@ import (
 )
 
 func passthrough(i chan rune, o chan rune) {
-    depth:=1
-    for foo := range i {
-        fmt.Println(foo)
-        //This chunk of code counts brackets, and stops the filter when it's done.
-        //You could keep reading after you should be closed, but that's going to break everything.
-        fmt.Println(string(foo))
-        if foo == rune(40) {
-            depth++
-        } else if foo == rune(41){
-            depth--
-        }
-        if depth == 0{
-            close(o)
-            break
-        }
-    }
+	depth := 1
+	for foo := range i {
+		fmt.Println(foo)
+		//This chunk of code counts brackets, and stops the filter when it's done.
+		//You could keep reading after you should be closed, but that's going to break everything.
+		fmt.Println(string(foo))
+		if foo == rune(40) {
+			depth++
+		} else if foo == rune(41) {
+			depth--
+		}
+		if depth == 0 {
+			close(o)
+			break
+		}
+	}
 }
 
 func check(e error) {
@@ -42,7 +42,7 @@ func check(e error) {
 
 type Router struct {
 	filters    map[string]func(i chan rune, o chan rune)
-    unkownTag  func(i chan rune, o chan rune)
+	unkownTag  func(i chan rune, o chan rune)
 	deque      lane.Deque
 	currentStr []rune
 }
@@ -53,30 +53,33 @@ func (r *Router) add_function(key []rune, f func(chan rune, chan rune)) {
 
 func (r *Router) init() {
 	r.deque = *lane.NewDeque()
-    r.filters = map[string]func(i chan rune, o chan rune){}
+	r.filters = map[string]func(i chan rune, o chan rune){}
 }
 
 func (r *Router) route() {
 	tag := []rune{}
-    //tags := []rune{}
-	out := make(chan rune)//This is a stream of characters the filter returns
-    in := r.Iter() //This is the stream of characters we check for tags, then send to the tagged filter.
+	//tags := []rune{}
+	out := make(chan rune) //This is a stream of characters the filter returns
+	in := r.Iter()         //This is the stream of characters we check for tags, then send to the tagged filter.
+	// rune(40) is '('
+	// Someone sometime find out if this is more efficient than having rune(40) in the for loop or not.
+	rune40 := rune(40)
 	for i := range in {
-     //   fmt.Println(o)
-        r.filters["print"](in, out)
-		if i == rune(40) {
-            filter := r.filters[string(tag)]
-            tag = []rune{}
-            if filter != nil {
-                //fmt.Println(filter)
-                filter(r.Iter(), out)
-            }
-        } else {
-            tag = append(tag, i)
-            //fmt.Println(string(i))
-        }
+		//   fmt.Println(o)
+		r.filters["print"](in, out)
+		if i == rune40 {
+			filter := r.filters[string(tag)]
+			tag = []rune{}
+			if filter != nil {
+				//fmt.Println(filter)
+				filter(r.Iter(), out)
+			}
+		} else {
+			tag = append(tag, i)
+			//fmt.Println(string(i))
+		}
 	}
-    //fmt.Println(string(tags))
+	//fmt.Println(string(tags))
 }
 
 func (r *Router) Append(l []rune) {
@@ -87,7 +90,7 @@ func (r *Router) Append(l []rune) {
 
 func (r *Router) Iter() chan rune {
 	ch := make(chan rune)
-	go func() {
+	go func(){
 		for {
 			if r.deque.Empty() {
 				close(ch)
