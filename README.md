@@ -1,5 +1,12 @@
-Some thoughts on a terminal with graphics support, and some attempts to get
-familiar with golang.
+#Goals
+
+Termunlator is an attempt at a rough specification for a frawing protocol
+intended to replace ANSI terminal emulator specification.
+
+In "curses" mode, it's intented to be competitive with the "html/css/javascript"
+stack, but without the focus on aesthetics or experience. That is, you should be
+able to use it to build applications with similar *functionality*, but it's not
+intended to be pretty or to be an extention of your marketing efforts.
 
 It follows unix philosophy. The basic idea is that there's a stream of text,
 and we pipe it through multiple functions, "simplyfying" it.
@@ -29,53 +36,53 @@ implement in order to actually render everything cleanly.
 
 If you're more interested in efficiency, you can pull that "polygon()" command
 out of the queue before it gets simplified into a series of lines and
-triangles.
+triangles. The "letter" tag is for demonstration purposes only, and should
+ probably never be used. 
 
-##Styling/color
 
-This project is *not* intended to be marketer freindly. You can customize how
-your data is presented to get the best user-experience possible, but it's not
-intended to help you with "brand awareness" or anything like that.
+#Stream-mode
 
-A lot of technical choices have/will be made that will make it generally
-difficult to take control away from your apps users and insert your own brand
-identity.
+Your program needs to output a stream of text, with tags that specify things
+like containers and colours.
 
-There are 7 colors you can use, by default.
+It's easier to tell then show, so here's an example of what a stream would look
+like
 
-Background, Default, Primary, Success, Info, Warning, and Danger.
-
-These generally map to Background (black, white), Neutral (grey), Purple, Green, Cyan, Yellow, and
-Red.
-
-There are low and high-contrast varients of each. On a black background, High
-contrast means the color is lighter. On a white background, it means it's
-darker.
-
-We hope to provide a variety of hatch styles, to furthur customize things like
-interactive maps.
-
-##Color tags example
 
 ```
-red(text(Hello World))
----
-SaveColor()
-SetColor(#F00)
-text(Hello World)
-RestoreColor()
+chunk(#(A single "line" as far as our scrollback is concerned)
+  color(primary
+    text(hello world)
+  )
+  color(primary-lc
+    text(subheading)
+  )
+)
 
 ```
 
-#Performance
+Instead of using ANSI control codes, we use tags, similar to html.
 
-This is my first major project in a statically typed language. It's go largely
-because I think I'm less likely to do something *horribly* wrong in golang then
-in C.
+#Colours
 
-That being said, it was created with performance in mind. I don't know how
-golangs internals work, but it makes heavy use of channels. Hopefully that
-minimizes cache mis-predicts, and can create some very fast code.
+We specify a default "pallette" of colors, similar to the ANSI, but instead of
+saying "red" or "blue" we specify when the color should be used, similar to
+bootstrap.
 
-It doesn't make good use of multithreading, but our routing functions should be
-able to handle it at some point in the future.
+Colours include
+
+ * Default-bg (default background, generally a dark colour)
+ * default-fg (default foreground, generally a bright colour. Normally used for
+   fonts)
+ * Primary
+ * Success
+ * Info
+ * Warning
+ * Danger
+
+as well as a high-contrast (hc) and low-contrast (lc) modifier for each.
+
+#User-input
+
+Passing user-input to your program.
+

@@ -1,8 +1,3 @@
-print(
-red(adawd)
-)
-green(text(awdalha))
-notPrint()
-print(hello world)
-print(わかりません)
-
+color(primary line(adawd))
+color(primary line(adawd))
+background(primary color(default-bg line(hello world)))
