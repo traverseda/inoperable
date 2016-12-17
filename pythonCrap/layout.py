@@ -11,9 +11,14 @@ flexBoxContext = {
     'yMax':None,
     'xMin':None,
     'yMin':None,
-    'xReal':None,
-    'yReal':None,
+    'xReal':0,
+    'yReal':0,
+    'children':[],
+    'parent':None,
+    'depth':0
 }
+
+depth=0
 
 def object():
     pass
@@ -21,7 +26,7 @@ def object():
 class WatcherDict(dict):
 
     def __init__(self, *args, **kwargs):
-        super(WatcherDict, self).__setitem__(*arg,**kwargs)
+        super(WatcherDict, self).__init__(*args,**kwargs)
         self.onUpdate = None
 
     def __setitem__(self, item, value):
@@ -29,18 +34,35 @@ class WatcherDict(dict):
             self.onUpdate(self, item, value)
         super(WatcherDict, self).__setitem__(item, value)
 
-class flexBox():
-    def __init__(self, parent, *arg, **kwargs):
-        self.context=WatcherDict
+class FlexBox():
+    def __init__(self, *args, **kwargs):
+        self.context=WatcherDict()
+        self.context.onUpdate = self.onUpdate
         self.context.update(flexBoxContext)
         self.context.update(kwargs)
-        self.context.onUpdate = self.onUpdate
-        self.parent=parent
+        for child in self.context['children']:
+            child.context['parent'] = self
 
     def onUpdate(self, d, item, value):
         pass
 
     def draw(self):
-        pass
+        print("{depth}: {xReal}".format(**self.context))
+        for child in self.context['children']:
+            child.draw()
+
     def layout(self):
-        pass
+        global depth
+        depth=depth+1
+        for child in self.context['children']:
+            child.layout()
+            child.context['depth']=depth
+            self.context['xReal']= self.context['xReal']+child.context['xReal']
+            self.context['yReal']= self.context['xReal']+child.context['yReal']
+         
+        return self
+
+r = FlexBox(children=[FlexBox(xReal=20),FlexBox(xReal=20)])
+
+r.layout().draw()
+
